@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class Node 
 {
-    private Vector3 worldPos;
-    private bool walkable; //avoid obstacles
+    public Vector3 worldPos;
+    public bool walkable; //avoid obstacles
     
 
     public Node(Vector3 worldPos, bool walkable)
