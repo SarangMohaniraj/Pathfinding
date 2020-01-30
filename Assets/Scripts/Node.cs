@@ -35,7 +35,7 @@ public class Node
      * 
      * only called for neighbor nodes, so always 45-45-90 triangle
      *
-     * read more at http://theory.stanford.edu/~amitp/GameProgramming/Heuristics.html
+     * read more at http://theory.stanford.edu/~amitp/GameProgramming/Heuristics.html#heuristics-for-grid-maps
      */
 
     public double DistanceToNode(Node node)
@@ -44,10 +44,5 @@ public class Node
         float dy = Mathf.Abs(gridY - node.gridY);
 
         return Mathf.Sqrt(2) * Mathf.Min(dx, dy) + Mathf.Abs(dx - dy);
-    }
-
-    public override string ToString() //debug only
-    {
-        return worldPos + " " + gridX + " " + gridY;
     }
 }

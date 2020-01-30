@@ -16,12 +16,13 @@ public class Pathfinding : MonoBehaviour
     void Update()
     {
         FindPath(seeker.position, target.position); //seeker or target may be moving so will need to constantly find a new path
+        if(grid.path.Capacity > 0)
+            seeker.position = Vector3.MoveTowards(seeker.position,grid.path[0].worldPos,.1f);
     }
 
     void FindPath(Vector3 startPos, Vector3 targetPos) {
         Node startNode = grid.GetCurrentNode(startPos);
         Node targetNode = grid.GetCurrentNode(targetPos);
-
 
         List<Node> openSet = new List<Node>(); //nodes to be evaluated
         HashSet<Node> closedSet = new HashSet<Node>(); //nodes already evaluated, HashSet has better performance for adding, especially as size increases

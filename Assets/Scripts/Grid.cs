@@ -14,7 +14,7 @@ public class Grid : MonoBehaviour
     float nodeDiameter { get { return nodeRadius * 2; } }
     int gridSizeX => Mathf.RoundToInt(gridWorldSize.x / nodeDiameter);
     int gridSizeY => Mathf.RoundToInt(gridWorldSize.y / nodeDiameter);
-    private void Awake()
+    private void Start()
     {
         //scalar*vector results vector
         grid = new Node[gridSizeX, gridSizeY];
@@ -25,6 +25,7 @@ public class Grid : MonoBehaviour
             for (int y = 0; y < gridSizeY; y++)
             {
                 Vector3 worldPos = origin + Vector3.right * (x * nodeDiameter + nodeRadius) + Vector3.forward * ( y * nodeDiameter + nodeRadius); //center of each node, not bottom left
+                worldPos.y = 1.64f;
                 grid[x, y] = new Node(worldPos, !Physics.CheckSphere(worldPos,nodeRadius,unwalkableMask),x,y);
             }
         }
@@ -33,8 +34,8 @@ public class Grid : MonoBehaviour
     public Node GetCurrentNode(Vector3 worldPos) //get the node the player is standing on
     {
         //position given by percentages from the origin to the upper bounds
-        float percentX = Mathf.Clamp01( (worldPos.x + gridSizeX/2) / gridSizeX );
-        float percentY = Mathf.Clamp01((worldPos.y + gridSizeY / 2) / gridSizeY);
+        float percentX = Mathf.Clamp01( (worldPos.x + gridSizeX / 2) / gridSizeX );
+        float percentY = Mathf.Clamp01( (worldPos.z + gridSizeY / 2) / gridSizeY );
 
         //node position in grid array
         int x = Mathf.RoundToInt(percentX * (gridSizeX - 1));
@@ -79,12 +80,7 @@ public class Grid : MonoBehaviour
             {
                 Vector3 worldPos = origin + Vector3.right * (x * nodeDiameter + nodeRadius) + Vector3.forward * (y * nodeDiameter + nodeRadius); //center of each node, not bottom left
                 Gizmos.color = !Physics.CheckSphere(worldPos, nodeRadius, unwalkableMask) ? Color.green : Color.red;
-
-                //foreach (Node node in path)
-                //{
-                //    Debug.Log(node);
-                //}
-                Debug.Log(path == null);
+                
                 if (path != null && grid != null && path.Contains(GetCurrentNode(worldPos)))
                     Gizmos.color = Color.black;
                 Gizmos.DrawWireCube(worldPos, Vector3.one * nodeDiameter);
