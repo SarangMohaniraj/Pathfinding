@@ -11,7 +11,7 @@ public class Node
 
     public double gCost { get; set; }
     public double hCost { get; set; }
-    public double fCost => gCost + fCost;
+    public double fCost => gCost + hCost;
 
     public Node parent { get; set; }
 
