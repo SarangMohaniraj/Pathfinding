@@ -8,20 +8,22 @@ public class Node
     public bool walkable; //avoid obstacles
     public int gridX;
     public int gridY;
+    public int movementPenalty; //value certain terrain types more
 
-    public double gCost { get; set; }
-    public double hCost { get; set; }
-    public double fCost => gCost + hCost;
+    public double GCost { get; set; }
+    public double HCost { get; set; }
+    public double FCost => GCost + HCost;
 
     public Node parent { get; set; }
 
 
-    public Node(Vector3 worldPos, bool walkable, int gridX, int gridY)
+    public Node(Vector3 worldPos, bool walkable, int gridX, int gridY, int movementPenalty)
     {                                           
         this.worldPos = worldPos;
         this.walkable = walkable;
         this.gridX = gridX;
         this.gridY = gridY;
+        this.movementPenalty = movementPenalty;
     }
 
     /* Heuristics for grid maps

@@ -1,10 +1,12 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Diagnostics;
 using UnityEngine;
 
 public class Pathfinding : MonoBehaviour
 {
     public Transform seeker, target;
+    public bool stopwatchIsActive;
+    bool stopwatchInitial = true;
     Grid grid;
     // Start is called before the first frame update
     void Start()
@@ -16,11 +18,15 @@ public class Pathfinding : MonoBehaviour
     void Update()
     {
         FindPath(seeker.position, target.position); //seeker or target may be moving so will need to constantly find a new path
-        if(grid.path.Capacity > 0)
-            seeker.position = Vector3.MoveTowards(seeker.position,grid.path[0].worldPos,.1f);
+        if (grid.path.Capacity > 0) //move and rotate seeker toward next node in path
+            Move(seeker, grid.path[0].worldPos);
     }
 
     void FindPath(Vector3 startPos, Vector3 targetPos) {
+        Stopwatch stopwatch = new Stopwatch();
+        if (stopwatchIsActive && stopwatchInitial)
+            stopwatch.Start();
+
         Node startNode = grid.GetCurrentNode(startPos);
         Node targetNode = grid.GetCurrentNode(targetPos);
 
@@ -34,7 +40,7 @@ public class Pathfinding : MonoBehaviour
             Node lowestCost = openSet[0];
             for(int i = 1; i < openSet.Count; i++)
             {
-                if (openSet[i].fCost < lowestCost.fCost || (openSet[i].fCost == lowestCost.fCost && openSet[i].hCost < lowestCost.hCost) ) //if fCost is the same, compare hCost
+                if (openSet[i].FCost < lowestCost.FCost || (openSet[i].FCost == lowestCost.FCost && openSet[i].HCost < lowestCost.HCost) ) //if fCost is the same, compare hCost
                     lowestCost = openSet[i];
             }
 
@@ -44,6 +50,11 @@ public class Pathfinding : MonoBehaviour
             if (lowestCost == targetNode) //We found our path!
             {
                 RetracePath(startNode, targetNode);
+                if (stopwatchIsActive && stopwatchInitial) { 
+                    stopwatch.Stop();
+                    stopwatchInitial = false;
+                    UnityEngine.Debug.Log(stopwatch.ElapsedMilliseconds + " ms");
+                }
                 return;
             }
 
@@ -52,11 +63,11 @@ public class Pathfinding : MonoBehaviour
                 if (!neighbor.walkable || closedSet.Contains(neighbor))
                     continue;
                 
-                double potentialCost = lowestCost.gCost + lowestCost.DistanceToNode(neighbor); //potential cost of moving to current neighbor node
-                if(potentialCost < neighbor.gCost || !openSet.Contains(neighbor))
+                double potentialCost = lowestCost.GCost + lowestCost.DistanceToNode(neighbor) + neighbor.movementPenalty; //potential cost of moving to current neighbor node
+                if(potentialCost < neighbor.GCost || !openSet.Contains(neighbor))
                 {
-                    neighbor.gCost = potentialCost;
-                    neighbor.hCost = neighbor.DistanceToNode(targetNode);
+                    neighbor.GCost = potentialCost;
+                    neighbor.HCost = neighbor.DistanceToNode(targetNode);
                     neighbor.parent = lowestCost;
 
                     if (!openSet.Contains(neighbor))
@@ -79,6 +90,23 @@ public class Pathfinding : MonoBehaviour
         path.Reverse();
 
         grid.path = path;
+    }
+
+    void Move(Transform seeker, Vector3 nextPos)
+    {
+        
+        float speed = 5 / (Mathf.Pow(grid.GetCurrentNode(seeker.position).movementPenalty, 2) + 30f);
+
+        nextPos.y = seeker.position.y;
+        seeker.position = Vector3.MoveTowards(seeker.position, nextPos, speed);
+
+        //find the vector pointing from our position to the target
+        Vector3 direction = (nextPos - seeker.position).normalized;
+        //create the rotation we need to be in to look at the target
+        Quaternion lookRotation = Quaternion.LookRotation(direction);
+        //rotate us over time according to speed until we are in the required rotation
+        seeker.rotation = Quaternion.Slerp(seeker.rotation, lookRotation, Time.deltaTime);
+
     }
 
     
