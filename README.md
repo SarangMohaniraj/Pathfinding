@@ -1,6 +1,6 @@
 # A* Pathfinding
 
-A* Pathfinding implementation in Unity3D as well as an online tool to help understanding the algorithm.
+A* Pathfinding implementation in Unity3D
 
 <p align="center"><img height="400" width="400" src="images/unity-demo.png" alt="Unity Demo">
 </p>
